@@ -34,34 +34,46 @@ with st.sidebar:
 
             with st.spinner("Processing documents..."):
 
+                files = []
+
                 for uploaded_file in uploaded_files:
 
-                    files = {
-                        "file": (
-                            uploaded_file.name,
-                            uploaded_file.getvalue(),
-                            "application/pdf"
+                    files.append(
+                        (
+                            "files",
+                           (
+                                uploaded_file.name,
+                                uploaded_file.getvalue(),
+                                "application/pdf"
+                            )
                         )
-                    }
-
-                    requests.post(
-                        f"{BACKEND_URL}/upload/",
-                        files=files
                     )
+
+                requests.post(
+                    f"{BACKEND_URL}/upload/",
+                    files=files
+                )
 
             st.success("Documents uploaded successfully!")
 
     st.divider()
 
-    if st.button("🗑 Clear Chat"):
-        st.session_state.messages = []
-        st.rerun()
+    if st.button("🗑 Clear Knowledge Base"):
 
+        requests.post(
+        f"{BACKEND_URL}/clear/"
+    )
+
+        st.session_state.messages = []
+
+        st.success("Knowledge Base Cleared!")
+
+        st.rerun()
 # -------------------------------
 # Chat
 # -------------------------------
 
-st.header("💬 Ask Enterorise AI")
+st.header("💬 Ask Enterprise AI")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
