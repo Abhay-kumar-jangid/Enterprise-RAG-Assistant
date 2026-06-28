@@ -1,15 +1,15 @@
 from fastapi import APIRouter
-from app.services.memory import ConversationMemory
+
 from app.models.schemas import ChatRequest
 from app.services.retriever import Retriever
 from app.services.llm import GeminiLLM
+from app.services.memory import ConversationMemory
 
 router = APIRouter(
     prefix="/chat",
     tags=["Chat"]
 )
 
-retriever = Retriever()
 llm = GeminiLLM()
 memory = ConversationMemory()
 
@@ -17,17 +17,12 @@ memory = ConversationMemory()
 @router.post("/")
 async def chat(request: ChatRequest):
 
-    retrieved_chunks = retriever.retrieve(
-        request.question,
-        top_k=5
-    )
+    retriever = Retriever()
 
     conversation = memory.get_context()
 
-    search_query = conversation + "\nUser: " + request.question
-
     retrieved_chunks = retriever.retrieve(
-        search_query,
+        request.question,
         top_k=5
     )
 
@@ -50,12 +45,14 @@ async def chat(request: ChatRequest):
             sources.append({
                 "filename": chunk["filename"],
                 "page": chunk["page"]
-        })
+            })
+
     memory.add(
         request.question,
         answer
     )
-    return{
-        "answer":answer,
-        "sources":sources
+
+    return {
+        "answer": answer,
+        "sources": sources
     }

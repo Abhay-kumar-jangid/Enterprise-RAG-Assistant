@@ -1,8 +1,8 @@
 from app.api.chat import router as chat_router
-from app.api.test_retriever import router as retriever_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.upload import router as upload_router
+from app.api.clear import router as clear_router
 
 app = FastAPI(
     title="Cross-Domain RAG Question Answering System",
@@ -19,8 +19,8 @@ app.add_middleware(
 )
 
 app.include_router(chat_router)
-app.include_router(retriever_router)
 app.include_router(upload_router)
+app.include_router(clear_router)
 
 
 @app.get("/")

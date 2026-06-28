@@ -1,5 +1,6 @@
 from app.services.rag_pipeline import RAGPipeline
 from fastapi import APIRouter, UploadFile, File
+from typing import List
 import os
 import shutil
 
@@ -13,23 +14,21 @@ router = APIRouter(
 pipeline = RAGPipeline()
 
 @router.post("/")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(files: List[UploadFile] = File(...)):
 
-    if not file.filename.endswith(".pdf"):
-        return {
-            "success": False,
-            "message": "Only PDF files are allowed."
-        }
+    for file in files:
 
-    save_path = os.path.join(DOCUMENTS_DIR, file.filename)
+        if not file.filename.endswith(".pdf"):
+            continue
 
-    with open(save_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        save_path = os.path.join(DOCUMENTS_DIR, file.filename)
+
+        with open(save_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
     pipeline.build_vector_database()
-    
+
     return {
         "success": True,
-        "filename": file.filename,
-        "message": "PDF uploaded and indexed successfully."
+        "message": f"{len(files)} document(s) uploaded and indexed successfully."
     }

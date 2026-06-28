@@ -2,16 +2,11 @@ from sentence_transformers import SentenceTransformer
 
 
 class EmbeddingModel:
-    """
-    Generates embeddings for document chunks.
-    """
 
-    def __init__(self):
-
-        # Lightweight and accurate model
-        self.model = SentenceTransformer(
-            "sentence-transformers/all-MiniLM-L6-v2"
-        )
+    # Load model only once
+    model = SentenceTransformer(
+        "sentence-transformers/all-MiniLM-L6-v2"
+    )
 
     def embed_documents(self, texts):
 
